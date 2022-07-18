@@ -1,0 +1,21 @@
+name: web-font-mdi
+version: 0.1.0.0
+maintainer: ners <ners@gmx.ch>
+github: ners/web-font-mdi
+category: Web
+license-file: LICENCE
+build-type: Custom
+
+description: This package contains a simple but comprehensive enumeration of all <https://materialdesignicons.com/ Material Design Icons> icon constants.
+
+custom-setup:
+  dependencies:
+    - Cabal
+    - aeson
+    - base
+    - text
+
+library:
+  source-dirs: src
+  dependencies:
+    - base
