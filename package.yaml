@@ -4,18 +4,22 @@ maintainer: ners <ners@gmx.ch>
 github: ners/web-font-mdi
 category: Web
 license-file: LICENCE
-build-type: Custom
+build-type: Simple
 
 description: This package contains a simple but comprehensive enumeration of all <https://materialdesignicons.com/ Material Design Icons> icon constants.
-
-custom-setup:
-  dependencies:
-    - Cabal
-    - aeson
-    - base
-    - text
 
 library:
   source-dirs: src
   dependencies:
     - base
+    - util
+
+internal-libraries:
+  util:
+    source-dirs: util
+    dependencies:
+      - base
+      - aeson
+      - file-embed
+      - template-haskell
+      - text

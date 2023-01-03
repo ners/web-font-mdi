@@ -2,11 +2,11 @@
   "nodes": {
     "flake-utils": {
       "locked": {
-        "lastModified": 1656928814,
-        "narHash": "sha256-RIFfgBuKz6Hp89yRr7+NR5tzIAbn52h8vT6vXkYjZoM=",
+        "lastModified": 1667395993,
+        "narHash": "sha256-nuEHfE/LcWyuSWnS8t12N1wc105Qtau+/OdUAjtQ0rA=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "7e2a3b3dfd9af950a856d66b0a7d01e3c18aa249",
+        "rev": "5aed5285a952e0b949eb3ba02c12fa4fcfef535f",
         "type": "github"
       },
       "original": {
@@ -18,11 +18,11 @@
     "mdi": {
       "flake": false,
       "locked": {
-        "lastModified": 1658025621,
-        "narHash": "sha256-KIw8TEpzx/QXUWfYXvFUy9w5sevt0lSImzTeDx+jjqg=",
+        "lastModified": 1672283385,
+        "narHash": "sha256-L7Rdq69jhL6I8D/CJAlDo0A174cnIauZHcqjJJPCuYM=",
         "owner": "Templarian",
         "repo": "MaterialDesign",
-        "rev": "3175cefb403dc32e147b240c010f3944a8d8f76c",
+        "rev": "190e9e00f50f98b02fd8bc5fbb78847dd5408bef",
         "type": "github"
       },
       "original": {
@@ -31,18 +31,33 @@
         "type": "github"
       }
     },
+    "nix-filter": {
+      "locked": {
+        "lastModified": 1666547822,
+        "narHash": "sha256-razwnAybPHyoAyhkKCwXdxihIqJi1G6e1XP4FQOJTEs=",
+        "owner": "numtide",
+        "repo": "nix-filter",
+        "rev": "1a3b735e13e90a8d2fd5629f2f8363bd7ffbbec7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "nix-filter",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1658015103,
-        "narHash": "sha256-mO+23f3SO+fBzEvbxRe6GkSB5Xp43CT2sV8Rs8MYdz8=",
+        "lastModified": 1672633908,
+        "narHash": "sha256-sP0BMp4DprVCBjcTYPsTPwkJMsc45vM0FxHdDx6qE8U=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "8f485713f5e6b6883a9b6959afa98688360a3ecb",
+        "rev": "a4379d2b0deefedc8dba360897557707ea9ee9a7",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-unstable",
+        "ref": "nixpkgs-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -51,6 +66,7 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "mdi": "mdi",
+        "nix-filter": "nix-filter",
         "nixpkgs": "nixpkgs"
       }
     }

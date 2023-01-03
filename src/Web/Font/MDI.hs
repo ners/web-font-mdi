@@ -1,3 +1,10 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module Web.Font.MDI where
 
--- GENERATED BELOW THIS LINE
+import TH
+
+mkMdiEnum
+
+mkMdiChar
