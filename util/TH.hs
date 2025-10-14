@@ -1,13 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 
 module TH where
 
-import Data.Aeson (FromJSON, Value (Object, String), decodeStrict, parseJSON, (.:))
+import Data.Aeson (FromJSON, Value (Object, String), decodeStrict, parseJSON, withObject, withText, (.:))
 import Data.Aeson.Types (Parser, prependFailure, typeMismatch)
 import Data.Char (chr, toUpper)
 import Data.FileEmbed (embedFile)
@@ -26,25 +25,23 @@ data Icon = Icon
     deriving (Generic, Show)
 
 instance FromJSON Name where
-    parseJSON (String s) = pure $ mkName $ Text.unpack s
-    parseJSON invalid = prependFailure "parsing name failed, " (typeMismatch "String" invalid)
+    parseJSON = withText "Name" $ pure . mkName . Text.unpack
 
 instance FromJSON Icon where
-    parseJSON (Object o) = do
+    parseJSON = withObject "Icon" $ \o -> do
         nameKebabCase :: Text <- o .: "name"
-        let nameParts = "mdi" : Text.splitOn "-" nameKebabCase
-        let name = mkName $ Text.unpack $ pascalCase nameParts
         codepointStr :: String <- o .: "codepoint"
-        let codepointInt = fst $ head $ readHex codepointStr
-        let codepoint = chr codepointInt
-        pure Icon{..}
-    parseJSON invalid = prependFailure "parsing icon failed, " (typeMismatch "Object" invalid)
+        [(codepointInt, "")] <- pure $ readHex codepointStr
+        pure
+            Icon
+                { name = mkName . Text.unpack . mconcat . fmap capitalise $ "mdi" : Text.splitOn "-" nameKebabCase
+                , codepoint = chr codepointInt
+                }
 
-pascalCase :: [Text] -> Text
-pascalCase = mconcat . fmap p
-  where
-    p "" = ""
-    p x = Text.cons (toUpper $ Text.head x) (Text.tail x)
+capitalise :: Text -> Text
+capitalise t
+    | Just (x, xs) <- Text.uncons t = Text.cons (toUpper x) xs
+    | otherwise = t
 
 icons :: [Icon]
 icons = fromMaybe (error "Could not parse file") $ decodeStrict @[Icon] $(embedFile "./meta.json")
@@ -54,17 +51,33 @@ mdiEnumName = mkName "MDI"
 
 mkMdiEnum :: DecsQ
 -- DataD Cxt Name [TyVarBndr ()] (Maybe Kind) [Con] [DerivClause]
-mkMdiEnum = pure [DataD [] mdiEnumName [] Nothing (con <$> icons) []]
+mkMdiEnum =
+    pure
+        [ DataD
+            []
+            mdiEnumName
+            []
+            Nothing
+            (con <$> icons)
+            [ DerivClause
+                Nothing
+                [ ConT ''Eq
+                , ConT ''Bounded
+                , ConT ''Enum
+                ]
+            ]
+        ]
   where
     con i = NormalC (name i) []
 
 mkMdiChar :: DecsQ
 -- FunD Name [Clause]
 -- Clause [Pat] Body [Dec]
-mkMdiChar = pure
-    [ SigD fname $ ArrowT `AppT` ConT mdiEnumName `AppT` ConT ''Char
-    , FunD fname (clause <$> icons)
-    ]
+mkMdiChar =
+    pure
+        [ SigD fname $ ArrowT `AppT` ConT mdiEnumName `AppT` ConT ''Char
+        , FunD fname (clause <$> icons)
+        ]
   where
     fname = mkName "mdiChar"
     clause i = Clause [ConP (name i) [] []] (body i) []
