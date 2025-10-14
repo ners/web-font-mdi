@@ -1,6 +1,10 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module Web.Font.MDI where
 
-data MDI = MdiAbTesting
+import TH
 
-mdiChar :: MDI -> Char
-mdiChar MdiAbTesting = '\983497'
+mkMdiEnum
+
+mkMdiChar

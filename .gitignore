@@ -1,4 +1,4 @@
+*.cabal
 .direnv
 dist-newstyle
 result
-*.json

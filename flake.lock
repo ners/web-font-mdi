@@ -1,13 +1,28 @@
 {
   "nodes": {
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1667395993,
+        "narHash": "sha256-nuEHfE/LcWyuSWnS8t12N1wc105Qtau+/OdUAjtQ0rA=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "5aed5285a952e0b949eb3ba02c12fa4fcfef535f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "mdi": {
       "flake": false,
       "locked": {
-        "lastModified": 1737338259,
-        "narHash": "sha256-QMGl7soAhErrrnY3aKOZpt49yebkSNzy10p/v5OaqQ0=",
+        "lastModified": 1672283385,
+        "narHash": "sha256-L7Rdq69jhL6I8D/CJAlDo0A174cnIauZHcqjJJPCuYM=",
         "owner": "Templarian",
         "repo": "MaterialDesign",
-        "rev": "2424e748e0cc63ab7b9c095a099b9fe239b737c0",
+        "rev": "190e9e00f50f98b02fd8bc5fbb78847dd5408bef",
         "type": "github"
       },
       "original": {
@@ -16,13 +31,28 @@
         "type": "github"
       }
     },
+    "nix-filter": {
+      "locked": {
+        "lastModified": 1666547822,
+        "narHash": "sha256-razwnAybPHyoAyhkKCwXdxihIqJi1G6e1XP4FQOJTEs=",
+        "owner": "numtide",
+        "repo": "nix-filter",
+        "rev": "1a3b735e13e90a8d2fd5629f2f8363bd7ffbbec7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "nix-filter",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1760349414,
-        "narHash": "sha256-W4Ri1ZwYuNcBzqQQa7NnWfrv0wHMo7rduTWjIeU9dZk=",
+        "lastModified": 1672633908,
+        "narHash": "sha256-sP0BMp4DprVCBjcTYPsTPwkJMsc45vM0FxHdDx6qE8U=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "c12c63cd6c5eb34c7b4c3076c6a99e00fcab86ec",
+        "rev": "a4379d2b0deefedc8dba360897557707ea9ee9a7",
         "type": "github"
       },
       "original": {
@@ -34,7 +64,9 @@
     },
     "root": {
       "inputs": {
+        "flake-utils": "flake-utils",
         "mdi": "mdi",
+        "nix-filter": "nix-filter",
         "nixpkgs": "nixpkgs"
       }
     }
