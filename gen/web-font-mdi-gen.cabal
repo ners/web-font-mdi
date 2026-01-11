@@ -1,0 +1,45 @@
+cabal-version:      3.0
+name:               web-font-mdi-gen
+version:            0.1.0.0
+build-type:         Simple
+
+common common
+  default-language: Haskell2010
+  ghc-options:
+    -Weverything
+    -Wno-safe
+    -Wno-unsafe
+    -Wno-missing-safe-haskell-mode
+    -Wno-missing-export-lists
+    -Wno-missing-import-lists
+    -Wno-missing-kind-signatures
+    -Wno-all-missed-specialisations
+
+  default-extensions:
+    BlockArguments
+    DeriveAnyClass
+    DeriveGeneric
+    DerivingStrategies
+    ForeignFunctionInterface
+    ImportQualifiedPost
+    NoImplicitPrelude
+    QuasiQuotes
+    ScopedTypeVariables
+    TemplateHaskell
+    TupleSections
+    TypeApplications
+    ViewPatterns
+
+executable gen
+  import: common
+  hs-source-dirs: .
+  main-is: Main.hs
+  build-depends:
+    aeson,
+    base,
+    bytestring,
+    fourmolu,
+    ghc,
+    ghc-source-gen,
+    text,
+    yaml,

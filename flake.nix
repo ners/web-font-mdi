@@ -1,6 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    ghc-source-gen = {
+      url = "github:google/ghc-source-gen";
+      flake = false;
+    };
     mdi = {
       url = "github:Templarian/MaterialDesign";
       flake = false;
@@ -22,21 +26,6 @@
           (file: any file.hasExt [ "cabal" "hs" "md" ])
           root;
       };
-      ghcsFor = pkgs: with lib; foldlAttrs
-        (acc: name: hp':
-          let
-            hp = tryEval hp';
-            version = getVersion hp.value.ghc;
-            majorMinor = versions.majorMinor version;
-            ghcName = "ghc${replaceStrings ["."] [""] majorMinor}";
-          in
-          if hp.value ? ghc && ! acc ? ${ghcName} && versionAtLeast version "9.10" && versionOlder version "9.12"
-          then acc // { ${ghcName} = hp.value; }
-          else acc
-        )
-        { }
-        pkgs.haskell.packages;
-      hpsFor = pkgs: { default = pkgs.haskellPackages; } // ghcsFor pkgs;
       pname = "web-font-mdi";
       version = concatStringsSep "." [
         (toString mdi-version.major)
@@ -44,24 +33,32 @@
         (toString mdi-version.patch)
       ];
       mdi-version = (fromJSON (readFile "${inputs.mdi}/font-build.json")).version;
-      haskell-overlay = hlib: hfinal: hprev: {
-        ${pname} = lib.pipe { } [
-          (hfinal.callCabal2nix pname (sourceFilter ./.))
-          (hlib.compose.overrideCabal (drv: { inherit version; }))
-          (drv: drv.overrideAttrs (attrs: {
-            postPatch = ''
-              ${attrs.postPatch or ""}
-              cp ${inputs.mdi}/meta.json .
-              sed -i "s/^version:.*/version: ${version}/" web-font-mdi.cabal
-            '';
-          }))
-        ];
-      };
+      haskell-overlay = pkgs:
+        with pkgs.haskell.lib.compose;
+        hfinal: hprev: {
+          "${pname}-gen" =
+            let hp = if hprev.ghc.targetPrefix == "" then hfinal else pkgs.haskellPackages; in
+            hp.callCabal2nix "${pname}-gen" "${inputs.self}/gen" {
+              ghc-source-gen = hp.callCabal2nix "ghc-source-gen" inputs.ghc-source-gen { };
+            };
+          ${pname} = lib.pipe { } [
+            (hfinal.callCabal2nix pname (sourceFilter ./.))
+            (overrideCabal (drv: { inherit version; }))
+            (drv: drv.overrideAttrs (attrs: {
+              postPatch = ''
+                ${attrs.postPatch or ""}
+                cp "${inputs.mdi}/meta.json" "${inputs.self}/fourmolu.yaml" .
+                "${lib.getExe hfinal."${pname}-gen"}" > src/Web/Font/MDI.hs
+                sed -i "s/^version:.*/version: ${version}/" web-font-mdi.cabal
+              '';
+            }))
+          ];
+        };
       overlay = final: prev: {
         haskell = prev.haskell // {
           packageOverrides = lib.composeManyExtensions [
             prev.haskell.packageOverrides
-            (haskell-overlay prev.haskell.lib)
+            (haskell-overlay prev)
           ];
         };
       };
@@ -70,7 +67,20 @@
       (system: pkgs':
         let
           pkgs = pkgs'.extend overlay;
-          hps = hpsFor pkgs;
+          hps = with lib; foldlAttrs
+            (acc: name: hp':
+              let
+                hp = tryEval hp';
+                version = getVersion hp.value.ghc;
+                majorMinor = versions.majorMinor version;
+                ghcName = "ghc${replaceStrings ["."] [""] majorMinor}";
+              in
+              if hp.value ? ghc && ! acc ? ${ghcName} && versionAtLeast version "9.4" && versionOlder version "9.13"
+              then acc // { ${ghcName} = hp.value; }
+              else acc
+            )
+            { default = pkgs.haskellPackages; }
+            pkgs.haskell.packages;
           libs = pkgs.buildEnv {
             name = "${pname}-libs";
             paths = map (hp: hp.${pname}) (attrValues hps);
@@ -86,17 +96,16 @@
           packages.${system}.default = pkgs.symlinkJoin {
             name = "${pname}-all";
             paths = [ libs docsAndSdist ];
-            inherit (hps.default.syntax) meta;
+            inherit (hps.default.${pname}) meta;
           };
           devShells.${system} =
             foreach hps (ghcName: hp: {
               ${ghcName} = hp.shellFor {
-                packages = ps: [ ps.${pname} ];
+                packages = ps: [ ps.${pname} ps."${pname}-gen" ];
                 nativeBuildInputs = with pkgs'; with haskellPackages; [
-                  cabal-install
                   cabal-gild
+                  cabal-install
                   fourmolu
-                ] ++ lib.optionals (lib.versionAtLeast (lib.getVersion hp.ghc) "9.4") [
                   hp.haskell-language-server
                 ];
                 shellHook = ''
